@@ -32,7 +32,7 @@
 		            <username>frozensank1</username>
 		            <password>SuperSank007</password>
 		            <applicationName>demo2</applicationName>
-		            <environment>SANDBOX</environment>
+		            <environment>sandbox</environment>
 		            <properties>
 		                <key>value</key>
 		            </properties>
