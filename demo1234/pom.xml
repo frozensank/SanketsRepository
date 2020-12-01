@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.mycompany</groupId>
-	<artifactId>demo2</artifactId>
+	<artifactId>demo1234</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>mule-application</packaging>
 
-	<name>demo2</name>
+	<name>demo1234</name>
 
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,18 +26,19 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-		        <cloudHubDeployment>
+				  <cloudHubDeployment>
 		            <uri>https://anypoint.mulesoft.com</uri>
 		            <muleVersion>4.2.1</muleVersion>
 		            <username>frozensank1</username>
 		            <password>SuperSank007</password>
 		            <applicationName>demo2</applicationName>
-		            <environment>sandbox</environment>
+		            <environment>Sandbox</environment>
+		                  <workerType>micro</workerType>
 		            <properties>
 		                <key>value</key>
 		            </properties>
 		        </cloudHubDeployment>
-		    </configuration>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
