@@ -1,0 +1,15 @@
+%dw 2.0
+
+type auto_8d98b8f4_5937_406a_873f_e84b53fb134a_Output_Variables_warehouse = {|
+  warehouse: {|
+    warehouseId: Number, 
+    warehouseName: String, 
+    warehouseLocation: String, 
+    products: Array<{|      product: {|        productName: String,         productCategory: String,         productId: Array<1 | 2 | 34 | 4>, 
+        productQuantity: Number, 
+        productCost: Number
+      |}
+    |}>
+  |}
+|}
+

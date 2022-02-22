@@ -1,0 +1,11 @@
+{
+  "sampleData": {
+    "3e20aef9-bf7d-49fe-954d-a55b4df6338f": {
+      "vars-warehouse": "sample_data/json.json",
+      "attributes": "sample_data/java.dwl"
+    },
+    "3cd63524-adec-4015-80eb-c5216affbb2b": {
+      "vars-warehouse": "sample_data/defaultstringtype.dwl"
+    }
+  }
+}
