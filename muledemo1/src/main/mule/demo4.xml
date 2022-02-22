@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="demo4Flow" doc:id="d8f63b2c-dc40-487d-bea8-596c13d93fde" >
+		<http:listener doc:name="Listener" doc:id="9c24896a-529a-44ea-90f1-2163012fa38c" config-ref="HTTP_Listener_config1" path="/demo4flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="acdee225-7cd1-4307-952a-7260fbea80ca" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"CurrentTime": now(),
+	"EST Time": now()>>"EST",
+	"year": now().year,
+	"day":now().day,
+	"AddYear": now() + |P2Y|,
+	"AddMonth": now()+ |P2M|,
+	"fomrating": now() as String {format: "YYYY/MMMM/DD mm"},
+	"only date":now() as Date,
+	"String to date":"2020-24-01" as Date{format:"yyyy-dd-MM"},
+	"type of object":typeOf("2020-24-01" as Date{format:"yyyy-dd-MM"}),
+	"convert format":("2020-24-01" as Date{format:"yyyy-dd-MM"}) as String {format:"yyMMMdd"},
+	"period between two dates":
+	(now()-(now()-|P2D|)).days,
+	"BC/AD":now() as String{format:"G"},
+	"WEEK": now() as String {format:"eeee"},
+	"AM/PM": now() as String{format:"a"},
+	"24 Hrs Format": now() as String {format:"K"},
+	"12 Hrs Format": now() as String {format:"k"},
+	"timezone": now() as String {format:""}
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="demo4Flow1" doc:id="885f2ca3-69da-4820-9598-df48fd958183" >
+		<http:listener doc:name="Listener" doc:id="3fd2d7b6-28cf-46e5-bba2-af656e896711" config-ref="HTTP_Listener_config1" path="/demo4Flow1"/>
+		<ee:transform doc:name="Transform Message" doc:id="0ad14f4a-e373-4edb-a852-1fcd5a523cff" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Arrays
+
+var arr=[1,2,7,5,5,6]
+var names=['mahesh','ankur','ayush','komal','nidhi','kiyansh']
+var users = [
+	{name: "mahesh", lastName: "sharma"}, 
+	{name: "ankur", lastName: "parashar"}, 
+	{name: "ayush", lastName: "parashar"}
+]
+var customers = 
+[	{id: "1", name:"Mahesh"},
+	{id: "2", name:"Ankur"},
+	{id: "3", name:"Ayush"},
+	{id: "5", name:"Kiyansh"}
+]
+var products = 
+[
+	{ownerId: "1", name:"Physics"},
+	{ownerId: "1", name:"Maths"}, 
+	{ownerId: "3", name:"Commerce"}, 
+	{ownerId: "4", name:"RocketScience"}
+]
+var arr0 = [] as Array<Number>
+---
+{
+	"ConutBy" :arr countBy(($ mod 2) == 0),
+	"divideBy": arr divideBy 2,
+	"divideBy":arr divideBy 4,
+	drop: names drop 4,
+	dropwhile:names dropWhile ($=='komal' or $=='ankur'),
+	dropwhile:arr dropWhile ($ mod 4) == 0,
+	takewhile:names takeWhile ($ == 'mahesh'),
+	indexof:names indexOf("ankur"),
+	indexwhere:names indexWhere (abc) -> abc startsWith "ki",
+	partition:arr partition (item) -> isEven (item),
+	split: names splitAt 4,
+	splitwhere:names splitWhere (item)-> item startsWith "ayu",
+	slice: slice (arr,1,4),
+	firstwith:users firstWith ((user,index)-> user.name =="ayush"),
+	every:arr every ($ mod 2) == 10,
+	some: arr some ($ mod 2) == 10,
+	reduce: [1,2,3,4] reduce ($$++$)
+	
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="d74fc355-b1ec-4ed2-aa89-3e148355b1f2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var baseArray=
+[
+ {
+  BaseQty: 1000.000000,
+  Whs: "01",
+  BatchNum: "BO1"
+ }, 
+ {
+  BaseQty: 650.000000,
+  Whs: "01",
+  BatchNum: "BO2"
+ }, 
+ {
+  BaseQty: 350.000000,
+  Whs: "01",
+  BatchNum: "BO3"
+ },
+ {
+  BaseQty: 350.000000,
+  Whs: "01",
+  BatchNum: "BO4"
+ }
+]
+var compareArray=
+[
+ {
+  ReduceQty: 100.000000,
+  BatchNum: "BO1"
+ }, 
+ {
+  ReduceQty: 250.000000,
+  BatchNum: "BO4"
+ }, 
+ {
+  ReduceQty: 1000.000000,
+  BatchNum: "BO8"
+ }
+]
+---
+baseArray map (item,index) -> 
+{ 
+    BaseQty: item.BaseQty - ((compareArray filter (it,in) -> it.BatchNum == item.BatchNum)[0].ReduceQty default 0),
+    Whs:item.Whs, 
+    BatchNum:item.BatchNum,
+    abc:((compareArray filter (it,in) -> it.BatchNum == item.BatchNum)[0].ReduceQty default 0)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

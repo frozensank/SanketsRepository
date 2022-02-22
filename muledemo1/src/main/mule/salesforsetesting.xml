@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="23f58f6f-ab69-4ae0-9913-08e1c8175803" >
+		<salesforce:basic-connection username="frozensank@sanket.com" password="SuperSank007!" securityToken="yGIVKpYtwbEp0C3rVtM4oHXaJ" />
+	</salesforce:sfdc-config>
+	<flow name="salesforsetestingFlow" doc:id="5bfd09b2-1aeb-4de1-8048-aa9a830d8022" >
+		<http:listener doc:name="Listener" doc:id="d5d8ed36-f908-4c1f-967e-550792c1e898" config-ref="HTTP_Listener_config1" path="/salesforse"/>
+		<ee:transform doc:name="Transform Message" doc:id="b85bb65b-5025-45cf-a0ec-6aeb1fd8d02a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="266bff9e-1e3f-4f77-9a96-39363a970db1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="202ddb62-e416-4afd-8d29-5368a7088178" transactionalAction="ALWAYS_BEGIN" transactionType="XA">
+			<salesforce:upsert doc:name="Upsert" doc:id="a2f9a9d6-d8b5-41f0-b1fc-587a6a928e08" config-ref="Salesforce_Config" objectType="Employee_Sank__c" externalIdFieldName="Id" />
+			<logger level="INFO" doc:name="Logger" doc:id="e7d0717d-d121-42d4-85b2-00e43a0fdd2a" message="#[output application/json&#10;---&#10;payload]" />
+			<salesforce:query doc:name="Query" doc:id="dd36ac8d-4b2a-494f-9be1-3bd1e6aacb2c" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[select  ID,Age__c,Name  from Employee_Sank__c where name = ':Name' limit 10]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"Name" : "Sanket_D"
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		</try>
+		<logger level="INFO" doc:name="Logger" doc:id="2c975d92-5e8f-4469-8c59-4490cd014998" message='#[output application/json&#10;skipNullOn="everywhere"&#10;---&#10;payload]'/>
+		<set-payload value="#['hi']" doc:name="Set Payload" doc:id="eea8020c-c62a-47ed-bedd-ac0f9e859cb6" />
+	</flow>
+	<flow name="salesforsetestingFlow1" doc:id="c2352c43-3273-4168-bf9e-8b58e80d8a99" >
+		<salesforce:replay-channel-listener doc:name="Replay channel listener" doc:id="b913a2c4-1390-4eb9-9bd4-a284e97d9199" config-ref="Salesforce_Config" autoReplay="true" replayOption="ONLY_NEW"/>
+	</flow>
+	<flow name="salesforsetestingFlow2" doc:id="fe5d5f66-4d88-4fe3-94f9-4e681fea1ce5" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="6f57eda2-603d-425f-bdf3-b4b27adb02e0" />
+		<anypoint-mq:consume doc:name="Consume" doc:id="d28e9078-7525-4a50-955c-ebb1fbcf4d1e" />
+		<anypoint-mq:publish doc:name="Publish" doc:id="0ad7f55b-9ece-4d9f-8336-cbe2a5e69873" />
+		<anypoint-mq:nack doc:name="Nack" doc:id="6c494176-ad7f-4a0a-84e2-65e832174f87" />
+	</flow>
+</mule>

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<a>
+  <Employee sal="rich">
+    <name>sanket</name>
+    <age>28</age>
+  </Employee>
+  <Employee sal="poor">
+    <name>rishabh</name>
+    <age>28</age>
+  </Employee>
+</a>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<flow name="demo7Flow" doc:id="aa53580c-9550-4af0-b97b-80d8db653e8c" >
+		<http:listener doc:name="Listener" doc:id="fc2778fd-8f1d-4734-810a-f34b5e80adfc" config-ref="HTTP_Listener_config1" path="/demo7flow"/>
+		<set-payload value="#[[1,2,3,4,5,6]]" doc:name="Set Payload" doc:id="e597edea-4e16-4a76-937a-3f3c7d6a4a66" />
+		<batch:job jobName="demo7Batch_Job" doc:id="6495cd94-dfb0-4f6a-bb2b-7e3c9c2707c4" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="4731306c-825b-4048-9034-63aa571656b8" acceptPolicy="ALL">
+					<set-payload value="#[(payload as Number)*10]" doc:name="Set Payload" doc:id="330cef08-aeab-446f-a3a6-926ebb41da0a" />
+					<logger level="INFO" doc:name="Logger" doc:id="34df774a-bc93-4a26-9b5a-5e11829b199f" message="payload"/>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="f8ce4d5c-0094-40e6-9226-69a1490292d4" streaming="true">
+						<logger level="INFO" doc:name="Logger" doc:id="275456cd-fedd-4828-998e-55f5e64bf1a1" message="payload"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="233275f5-04ef-4a34-9ea7-6d2667fe084c" message="payload"/>
+			</batch:on-complete>
+		</batch:job>
+		<logger level="INFO" doc:name="Logger" doc:id="07e663d0-3aa2-40e3-93af-ba55c9c6f6fb" message="''"/>
+	</flow>
+</mule>

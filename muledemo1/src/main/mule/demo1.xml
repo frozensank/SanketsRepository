@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd">
+	<flow name="demoFlow1" doc:id="6079e973-f648-4aa3-bc97-32f92cdc834b" >
+		<http:listener doc:name="Listener" doc:id="68885005-30ca-48bd-b141-09214d67b789" path="/demoflow1" config-ref="HTTP_Listener_config1">
+			<http:response >
+				<http:body ><![CDATA[#[output application/json
+---
+payload]]]></http:body>
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"status" : "1000"
+}]]]></http:headers>
+			</http:response>
+		</http:listener>
+		<set-payload value='#[output application/json&#10;---&#10;{&#10;"Employee":[&#10;	{&#10;	"Name":"Sanket",&#10;	"Age":"29"&#10;	},&#10;	{&#10;	"Name":"Sanket2",&#10;	"Age":"30"&#10;	},&#10;	{&#10;	"Name":"Sanket3",&#10;	"Age":"29"&#10;	},&#10;	{&#10;	"Name":"Sanket4",&#10;	"Age":"30"&#10;	}&#10;	]&#10;}]' doc:name="Set Payload" doc:id="5843595f-5eac-4014-9d45-a4c0cbaf1976" />
+		<scatter-gather doc:name="Scatter-Gather" doc:id="3b05afd3-90f3-43c1-ba66-98a7d9c37e3e" >
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="71bc9e96-2f3a-4784-bf9d-21f85f9404fb" name="demoSub_Flow1"/>
+				<set-variable value='#[output application/json&#10;---&#10;payload.Employee.Sal]' doc:name="Set Variable" doc:id="4884a186-ba52-4236-b766-85ca2ab83806" variableName="Emplvar1" />
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="e336d32b-e6be-4ec3-ba31-a35295989a73" name="demoSub_Flow2"/>
+				<set-variable value='#[output application/json&#10;---&#10;payload.Employee.Name]' doc:name="Set Variable" doc:id="6583be70-5032-4dc8-a29f-053b2d4eaede" variableName="Emplvar2"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="d3e6fb2c-f819-4ed7-a913-52ef4d22a48d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	abc:vars.Emplvar1,
+	xyz:vars.Emplvar2
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="024e353b-f675-4c05-a4ee-78151b408c01" message='#[output application/json&#10;&#10;---&#10;payload]'/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8c6b95f4-f14e-4c95-b302-0083e4489e06">
+				<logger level="INFO" doc:name="Logger" doc:id="80d0ad5d-a54d-42a1-a7d8-7d35abdc9e1c" message='#["inside on error continue"]'/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="demoFlow2" doc:id="8abebd57-34c1-4225-90ce-a87850ed0714" >
+		<http:listener doc:name="Listener" doc:id="706c4e3a-a0a0-4c12-8a39-06868107dcc9" path="/demoFlow2" config-ref="HTTP_Listener_config1"/>
+		<set-variable value='#[{&#10;"Employee":[&#10;	{&#10;	"Name":"Sanket",&#10;	"Sal":"13"&#10;	},&#10;	{&#10;	"Name":"rishabh",&#10;	"Sal":"25"&#10;	},&#10;	{&#10;	"Name":"Kedar",&#10;	"Sal":"24"&#10;	},&#10;	{&#10;	"Name":"raut",&#10;	"Sal":"13"&#10;	}&#10;	]&#10;}]' doc:name="Set Variable" doc:id="6bbde037-f70d-427f-af7b-c658d1889e34" variableName="EmployeeVar"/>
+		<set-payload value='#[{&#10;"Employee":[&#10;	{&#10;	"Name":"Sanket",&#10;	"Age":"29"&#10;	},&#10;	{&#10;	"Name":"rishabh",&#10;	"Age":"30"&#10;	},&#10;	{&#10;	"Name":"kedar",&#10;	"Age":"29"&#10;	},&#10;	{&#10;	"Name":"raut",&#10;	"Age":"30"&#10;	}&#10;	]&#10;}]' doc:name="Set Payload" doc:id="6298c3d5-760d-41c0-a899-f1620d29a921" />
+		<ee:transform doc:name="Transform Message" doc:id="d8e42305-a457-4b48-a0f0-fe3ed4d06faa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[output application/json
+---
+
+Employee:[payload.Employee map(object,index)->{
+	Name:object.Name,
+	Age:object.Age,
+	
+(vars.EmployeeVar.Employee  filter($.Name==object.Name) map(obj,idx)->{
+sal:obj.Sal
+}
+)
+},
+payload.Employee map(object,index)->{
+	Name:object.Name,
+	Age:object.Age,
+	
+(vars.EmployeeVar.Employee  filter($.Name==object.Name) map(obj,idx)->{
+sal:obj.Sal
+}
+)
+	
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1b2f2251-4bb4-4cd1-86b3-8133cfa108d4" message="#[output application/json&#10;---&#10;payload]"/>
+	</flow>
+	<sub-flow name="demoSub_Flow1" doc:id="85b6d0ee-acd2-4b7b-ae7a-77262d0e3a6d" >
+		<set-payload value='#[{&#10;"Employee":[&#10;	{&#10;	"Name":"Sanket",&#10;	"Sal":"13"&#10;	},&#10;	{&#10;	"Name":"rishabh",&#10;	"Sal":"25"&#10;	},&#10;	{&#10;	"Name":"Kedar",&#10;	"Sal":"24"&#10;	},&#10;	{&#10;	"Name":"raut",&#10;	"Sal":"13"&#10;	}&#10;	]&#10;}]' doc:name="Set Payload" doc:id="169e643e-f99f-4f1f-a99b-d87a3bb277ec" />
+	</sub-flow>
+	<sub-flow name="demoSub_Flow2" doc:id="462a4a36-6534-47c9-972b-da881cd9c5c7" >
+		<set-payload value='#[{&#10;"Employee":[&#10;	{&#10;	"Name":"Sanket3",&#10;	"Age":"29"&#10;	},&#10;	{&#10;	"Name":"Sanket4",&#10;	"Age":"29"&#10;	}&#10;	]&#10;}]' doc:name="Set Payload" doc:id="fb470e8f-2788-4aaa-8883-73d8525eb9e2" />
+	</sub-flow>
+</mule>

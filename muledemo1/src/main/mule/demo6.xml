@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<flow name="demo6Flow" doc:id="fa32f8ec-4a7e-45e0-93a0-e5a376b4ec07" >
+		<http:listener doc:name="Listener" doc:id="7d9a7ca5-d95b-4faf-92b7-5104a7502d54" config-ref="HTTP_Listener_config1" path="/demo6flow"/>
+		<set-payload value="#[[1,2,'a',3,'x',4,'c',5,6,7]]" doc:name="Set Payload" doc:id="9e4574d3-96b9-402a-94b1-89e14363d44f" />
+		<set-variable value="#[0]" doc:name="Set Variable" doc:id="cfa0503b-0d8a-4bde-a441-25e1970ce112" variableName="ans"/>
+		<set-variable doc:name="Set Variable" doc:id="4f671e7c-8c66-43fd-95ec-0e6073a1ff63" variableName="success" value="#[output application/json&#10;---&#10;[]]"/>
+		<set-variable doc:name="Set Variable" doc:id="8191e797-aa89-4b9f-9029-08ed536388be" variableName="fail" value="#[output application/json&#10;---&#10;[]]"/>
+		<foreach doc:name="For Each" doc:id="7355a49c-c3a6-45b0-89ba-0a87e2f14931" collection="#[payload]">
+			<try doc:name="Try" doc:id="d333470b-5ee4-4a09-82cb-06272cf93caa" >
+				<set-variable value="#[output application/json&#10;---&#10;vars.ans + (payload * 10)]" doc:name="Set Variable" doc:id="32b02391-564c-4f0b-8b1a-e114d17a33ab" variableName="ans" />
+				<set-variable value="#[output application/json&#10;---&#10;&#10;vars.success + payload]" doc:name="Set Variable" doc:id="3ae36b6d-53f5-43aa-ad10-198aefb23c2d" variableName="success"/>
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c3767ea5-e8e9-4ba5-96a8-62b11b220966" >
+						<set-variable value="#[output application/json&#10;---&#10;vars.fail + payload]" doc:name="Set Variable" doc:id="69dab220-3383-44b6-8fb3-577d928b3ef0" variableName="fail"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</foreach>
+		<set-payload value="#[output application/json ---&#10;&#10;{&#10;ans:vars.ans,&#10;fail:vars.fail,&#10;success:vars.success&#10;}]" doc:name="Set Payload" doc:id="37710e51-6e44-4b20-aa5c-949c14784e59" mimeType="application/json"/>
+	</flow>
+	<flow name="demo6Flow1" doc:id="055a0e94-59e1-4dc8-a473-a1d8ce367df5" >
+		<http:listener doc:name="Listener" doc:id="7e0dd4a7-ea93-42fd-92f0-69a40ab54eb0" config-ref="HTTP_Listener_config1" path="/demo6flow1"/>
+		<set-payload value="#[output application/json&#10;---&#10;[1,2,3,4,5,6,7,8,9,10]]" doc:name="Set Payload" doc:id="5cf449cf-59dd-4222-b05e-2fd5d42954b3" />
+		<parallel-foreach doc:name="Parallel For Each" doc:id="a5dc05c8-fcd4-4493-af4f-cf1809d71f63" collection="#[payload]">
+			<logger level="INFO" doc:name="Logger" doc:id="1d79884b-d376-41aa-ae4f-c8d7abf38e30" message="payload"/>
+			<set-payload value="#[payload * 10]" doc:name="Set Payload" doc:id="2131be78-839f-4630-b6a8-20ba6eb427e3" />
+		</parallel-foreach>
+		<set-payload value="#[output application/json ---&#10;payload.payload]" doc:name="Set Payload" doc:id="c37f6816-769f-480d-9147-f623f120b906" mimeType="application/json"/>
+		<logger level="INFO" doc:name="Logger" doc:id="703d2d8f-7b1d-4cac-92d2-a22f6e8fb82f" message="#[output application/json ---&#10;payload]"/>
+	</flow>
+	<flow name="demo6Flow2" doc:id="6927a47a-afbc-467f-9aaf-d7d69f15b9e2" >
+		<http:listener doc:name="Listener" doc:id="3ac5a88a-e691-4082-9438-1f4ff9f6c822" config-ref="HTTP_Listener_config1" path="/demo6Flow2"/>
+		<set-payload value="#[[1,2,3,4,5]]" doc:name="Set Payload" doc:id="1f068ec9-1946-4dc8-a9ca-2ac0a9d170fa" />
+		<batch:job jobName="demo6Batch_Job" doc:id="e57d1e6c-f702-493c-a6d9-da2e20965358" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="48ccdcc5-b7e5-41fe-992a-40f3b79eae64" acceptPolicy="ALL">
+					<set-payload value="#[(payload as Number) *10]" doc:name="Set Payload" doc:id="5c43a0b2-d703-471a-a40a-4f074a618d69" />
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="a754fbdd-0978-4ba2-bb03-2a0be37312e5" size="2">
+						<logger level="INFO" doc:name="Logger" doc:id="ea681a4c-6436-4e40-9a5b-bfb5bb18d5d2" message="payload"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="62c34f77-cecc-4711-a2b2-b735b9285b1c" message="payload"/>
+			</batch:on-complete>
+		</batch:job>
+		<logger level="INFO" doc:name="Logger" doc:id="1b7b116e-03a4-4b49-b979-0d34124cb04e" message="payload"/>
+	</flow>
+</mule>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="62dbd11f-d0ca-4961-8c2a-35ab0e4d680c" >
+		<os:connection >
+			<reconnection />
+		</os:connection>
+	</os:config>
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="b78cf250-1fca-4c1a-a286-29f8957dbed9" >
+		<os:private-object-store config-ref="ObjectStore_Config" />
+	</ee:object-store-caching-strategy>
+	<flow name="demo9Flow" doc:id="a0f72056-c00e-4840-a9cd-bb5f8a177d05" >
+		<http:listener doc:name="Listener" doc:id="94152de8-52f3-4028-b46b-e972ead1dc5d" config-ref="HTTP_Listener_config1" path="/demo9flow"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="f9d01ecb-9a19-468e-8e63-6571362a2bd9" mimeType="application/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="db240082-ad85-4dc8-ac9b-8db321ede4de" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<os:retrieve-all doc:name="Retrieve all" doc:id="b4d46374-9e68-41b6-87e5-ff12bf826fe0" />
+		<logger level="INFO" doc:name="Logger" doc:id="0b2513c9-e446-4944-999a-650e7cddccce" />
+	</flow>
+</mule>

@@ -1,0 +1,1 @@
+fun checkStatus(salary)=if (salary>50) "rich" else "poor"

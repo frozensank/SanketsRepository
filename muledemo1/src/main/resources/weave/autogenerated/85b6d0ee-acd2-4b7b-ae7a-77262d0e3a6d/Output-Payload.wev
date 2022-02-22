@@ -1,0 +1,6 @@
+%dw 2.0
+
+type auto_85b6d0ee_acd2_4b7b_ae7a_77262d0e3a6d_Output_Payload = {|
+  Employee: Array<{|    Name: String,     Age: String  |}>
+|}
+

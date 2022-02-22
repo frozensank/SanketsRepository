@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<os:object-store name="Object_store_test1" doc:name="Object store" doc:id="5b831fbf-686a-4c72-91c6-88324f45888a" />
+	<flow name="demo8Flow" doc:id="b15fcd23-ff90-44dd-9fb2-1eef592318ee" >
+		<http:listener doc:name="Listener" doc:id="4bcfe74f-287a-4647-9ffc-318422a34fda" config-ref="HTTP_Listener_config1" path="/demo8flow"/>
+		<os:store doc:name="Store" doc:id="7085dfdb-49b2-4dd4-be31-d1f4dc2e7416" key="warhouse1" objectStore="Object_store_test1">
+			<os:value ><![CDATA[#[output application/json
+---
+{
+  "warehouse": {
+    "warehouseId": 123,
+    "warehouseName": "xyz",
+    "warehouseLocation": "bhivandi",
+    "products": [
+      {
+        "product": {
+          "productName": "bat",
+          "productCategory": "sport",
+          "productId": [1,2,34,4],         
+           "productCost": 15000
+        }},
+		 {
+        "product": {
+          "productName": "ball",
+          "productCategory": "sport",
+          "productId": [21,22,34,42],           
+          "productCost": 8000
+        }},
+		{
+        "product": {
+          "productName": "	",
+          "productCategory": "cloths",
+          "productId": [41,42,46,49],           
+          "productCost": 500
+        }},
+		{
+        "product": {
+          "productName": "pant",
+          "productCategory": "cloths",
+          "productId": [81,82,834,84],  	         
+          "productCost": 8500
+        }
+      }
+    ]
+  }
+}]]]></os:value>
+		</os:store>
+		<logger level="INFO" doc:name="Logger" doc:id="4d0a6e4d-f43f-4289-af79-420327706b5b" message="payload"/>
+		<os:retrieve doc:name="Retrieve" doc:id="54db957d-314e-4ad8-8eff-55e11af8eed2" key="warhouse1" objectStore="Object_store_test1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fe638133-5ec5-4036-b86f-601cb073da9e" message="payload"/>
+		<os:retrieve-all-keys doc:name="Retrieve all keys" doc:id="594f4c0c-e59d-48ee-9e42-8639983e03b0" objectStore="Object_store_test1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="383987f4-606f-4e42-92c8-0c81efc06543" message="payload"/>
+	</flow>
+</mule>

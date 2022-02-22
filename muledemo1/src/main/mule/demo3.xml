@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="demo3Flow" doc:id="3b64983d-11a6-4b2d-a0a1-8ce383e36599" >
+		<http:listener doc:name="Listener" doc:id="e555f42e-29b5-462b-9402-0281198fb7c1" config-ref="HTTP_Listener_config1" path="/demo3flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="5271c479-7c25-46cd-a325-753727b7dfdd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+var a=
+	Employee:
+	[{
+		"name":"sanket",
+		"age":29,
+		"salary":50
+		
+	},
+	{
+		"name":"rishabh",
+		"age":28,
+		"salary":150
+	},
+	{
+		"name":"raut",
+		"age":35,
+		"salary":100
+	}
+	]
+	
+var b= 
+Employee:
+[{
+	"name":"raut",
+	"age":30,
+	"salary":"100"
+}]
+
+fun checkStatus(salary)=if (salary>50) "rich" else "poor"
+
+--- 
+a:{( a.Employee map(obj,idx) ->{
+	Employee @(sal:checkStatus(obj.salary)):{
+	name:obj.name,
+	age:obj.age}
+}
+	
+	
+)}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="05d2ec54-5fcf-4c15-b23a-ab1ebf2b0521" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="097a628e-4918-407c-bf6d-9ec4d2c6329a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var a=
+	Employee:
+	[{
+		"name":"sanket",
+		"age":29,
+		"salary":50
+		
+	},
+	{
+		"name":"rishabh",
+		"age":28,
+		"salary":150
+	},
+	{
+		"name":"raut",
+		"age":35,
+		"salary":100
+	}
+	]
+	
+var b= 
+Employee:
+[{
+	"name":"raut",
+	"age":30,
+	"salary":"100"
+}]
+
+fun checkStatus(salary)=if (salary>50) "rich" else "poor"
+
+--- 
+{a:( a.Employee [0] pluck ((value, key, index) -> 
+	key
+)) reduce ((item, acc) -> acc ++ item ),
+b: a.Employee map ((item, index) ->
+	item
+),
+c: a.Employee[0] mapObject ((value, key, index) -> (key):value
+),
+d: a.Employee == b.Employee ,
+e: {
+		"name":"sanket",
+		"age":29,
+		"salary":50
+		
+	} pluck ((value, key, index) -> key:value )
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="demo3Flow1" doc:id="77955c4b-3ef3-415d-b233-44d2ad9dd454" >
+		<http:listener doc:name="Listener" doc:id="e7f2207d-188f-470d-845e-ba42385a27e4" config-ref="HTTP_Listener_config1" path="/demo3flow1"/>
+		<ee:transform doc:name="Transform Message" doc:id="1ed8cfb8-cd4f-4366-8d9d-207bc27d8258" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="9021ff7f-a000-4766-9cea-4dc459119353" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="demo3Flow2" doc:id="9251dbfa-a4c0-4739-a327-a4542234782e" >
+		<http:listener doc:name="Listener" doc:id="116d43e2-4745-4bb5-8832-88e1365b0087" config-ref="HTTP_Listener_config1" path="/demo3flow2"/>
+		<ee:transform doc:name="Transform Message" doc:id="ceb055d9-9218-4811-a3d5-96b6abc7bd7b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output multipart/form-data
+---
+{
+    "parts": {
+        "payload1": {
+            "headers": {
+                "Content-Disposition": {
+                    "name": "payload1",
+                    "subtype": "form-data"
+                }
+            },
+            "content": "{\"name\":\"sanket\"}"
+        },
+        "payload2": {
+            "headers": {
+                "Content-Disposition": {
+                    "name": "payload2",
+                    "subtype": "form-data"
+                }
+            },
+            "content": "{\"name\":\"rishabh\"}"
+        }
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,65 @@
+#%RAML 1.0
+
+types:
+  product:
+    examples:
+      output: !include /example/products.raml
+    type: any
+
+
+title: shop
+/ProductbyCategory:
+ get:
+   queryParameters:
+     productCategory:
+      required: true
+   responses:
+    200:
+      body:
+        application/json:
+         type: product
+         examples:
+           output: product
+          
+    201:
+      body:
+        application/json:
+         example:
+           message: product not found
+          
+/productbyName:
+  get:
+    queryParameters:
+      productName:
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
+            type: product
+            examples:
+              output: products
+      201:
+        body:
+          application/json:
+              example:
+                message: product not found
+
+/order:
+ post:
+   body:
+     application/json:
+       type: product
+       examples:
+         input: product
+   responses:
+    200:
+        body:
+          application/json:
+            example:
+              message: order placed
+    201:
+      body:
+        application/json:
+          example:
+            message: issue while placing order please try again
